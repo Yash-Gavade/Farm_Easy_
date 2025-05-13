@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live YOLOv10 Detection</title>
+    <script>
+        async function captureImage() {
+            document.getElementById("capture-btn").disabled = true;
+            document.getElementById("loading").style.display = "block";
+
+            const response = await fetch('/capture', { method: 'POST' });
+            window.location.href = response.url;
+        }
+    </script>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        #loading { display: none; }
+    </style>
+</head>
+<body>
+    <h1>YOLOv10 Webcam Detection</h1>
+    <button id="capture-btn" onclick="captureImage()">Capture Image</button>
+    <p id="loading">Processing, please wait...</p>
+</body>
+</html>

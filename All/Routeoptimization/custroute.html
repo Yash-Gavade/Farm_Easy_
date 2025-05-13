@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Delivery Tracker</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fb;
+    }
+
+    header {
+      padding: 16px;
+      background: #0078d7;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    #map {
+      height: calc(100vh - 60px);
+      width: 100%;
+    }
+
+    .eta-box {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>📍 Live Delivery Tracker</header>
+
+  <div id="map"></div>
+  <div class="eta-box" id="etaBox">Fetching location...</div>
+
+  <!-- Leaflet JS & Firebase SDK -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCzRVCkDarCIcSHcZ2os4LSQjYnWIF8dvQ",
+      authDomain: "deliverytracker123.firebaseapp.com",
+      databaseURL: "https://deliverytracker123-default-rtdb.firebaseio.com",
+      projectId: "deliverytracker123",
+      storageBucket: "deliverytracker123.appspot.com",
+      messagingSenderId: "929027973522",
+      appId: "1:929027973522:web:0626587e2d1af63294614b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Initialize Map
+    const map = L.map('map').setView([0, 0], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    let marker;
+    const etaBox = document.getElementById('etaBox');
+
+    db.ref('delivery-person/currentLocation').on('value', snapshot => {
+      const data = snapshot.val();
+      if (data && data.latitude && data.longitude) {
+        const { latitude, longitude } = data;
+        const latlng = [latitude, longitude];
+
+        if (!marker) {
+          marker = L.marker(latlng, {
+            icon: L.divIcon({
+              className: '',
+              html: '<div style="background:#0078d7;width:16px;height:16px;border-radius:50%;border:3px solid white;"></div>',
+              iconSize: [16, 16],
+              iconAnchor: [8, 8]
+            })
+          }).addTo(map).bindPopup("Delivery is here");
+          map.setView(latlng, 15);
+        } else {
+          marker.setLatLng(latlng);
+        }
+
+        etaBox.style.display = 'block';
+        etaBox.innerText = "Live Location Updated ✔️";
+      } else {
+        etaBox.style.display = 'block';
+        etaBox.innerText = "Location not available.";
+      }
+    });
+  </script>
+</body>
+</html>

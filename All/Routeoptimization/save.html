@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapRoute Pro</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        /* General body and layout */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fb;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Top Bar styling */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 14px 20px;
+            z-index: 1000;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0078d7;
+        }
+
+        select,
+        input,
+        button {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+
+        input {
+            width: 220px;
+        }
+
+        button {
+            background: #0078d7;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        button:hover {
+            background: #005bb5;
+        }
+
+        /* Travel Info box styling */
+        .travel-info {
+            position: absolute;
+            top: 750px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            color: #111;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            display: none;
+        }
+
+        /* Modal for opening maps */
+        #mapChoiceModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        #mapChoiceModal > div {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Modal content container */
+        .modal-content {
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Small Close (X) button styling */
+        .close-button {
+            background: transparent;
+            border: none;
+            font-size: 16px; /* Small size */
+            color: #000000;
+            cursor: pointer;
+            position: absolute;
+            top: 5px;  /* Adjusted to be near the top */
+            right: 5px; /* Rightmost corner */
+            font-weight: bold;
+            padding: 0;
+            width: 20px; /* Size of the button */
+            height: 20px; /* Size of the button */
+            text-align: center;
+            line-height: 20px; /* Vertically center the "X" */
+        }
+
+        .close-button:hover {
+            color: #ffffff;
+        }
+
+        
+
+        .google-button {
+            background: #4285F4;
+            color: white;
+        }
+
+        .apple-button {
+            background:  #4285F4;
+            color: white;
+        }
+
+        .cancel-button {
+            background: transparent;
+            color: #000000;
+            margin-top: 3px;
+        }
+
+        /* Fade-in animation for the modal */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Query for mobile */
+        @media (max-width: 600px) {
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+                width: 92%;
+                left: 4%;
+                transform: none;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            #map {
+                height: 70vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Bar UI -->
+    <div class="top-bar">
+        <div class="logo">🧭 Route Pro</div>
+        <select id="transportMode" onchange="changeRoute()">
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+            <option value="foot">Walk</option>
+        </select>
+        <input type="text" id="destinationInput" placeholder="Enter destination" />
+        <button onclick="setDestination()">Navigate</button>
+        <button onclick="openMapsConfirm()">Open in Maps</button>
+    </div>
+
+    <!-- Travel Time Info -->
+    <div class="travel-info" id="travelInfoBox">Estimated Time: --</div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <div id="mapChoiceModal">
+        <div class="modal-content">
+            <button onclick="openSelectedMap('google')" class="google-button">Google Maps</button>
+            <button onclick="openSelectedMap('apple')" class="apple-button">Apple Maps</button>
+            <!-- Cross icon (Close button) -->
+            <button onclick="closeMapModal()" class="close-button">&times;</button>
+        </div>
+    </div>
+    
+
+    <script>
+        let map = L.map('map').setView([52.52, 13.405], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let currentLocationMarker, destinationMarker, routePolyline;
+        let startCoords = null;
+        let destinationCoords = null;
+        const api_key = 'f4f29219-5a97-470b-a192-ccef64faaf14'; // Placeholder API Key
+
+        // Use Geolocation API to update current location
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updateCurrentLocation, handleLocationError, {
+                enableHighAccuracy: true,
+                maximumAge: 10000
+            });
+        } else {
+            alert("Geolocation not supported by this browser.");
+        }
+
+        function updateCurrentLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            startCoords = [lat, lon];
+
+            if (!currentLocationMarker) {
+                currentLocationMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        className: 'leaflet-div-icon',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10],
+                        html: '<div style="width: 10px; height: 10px; background-color: #0078d7; border-radius: 50%; border: 3px solid white;"></div>'
+                    })
+                }).addTo(map).bindPopup("You are here").openPopup();
+
+                map.setView([lat, lon], 16);
+            } else {
+                currentLocationMarker.setLatLng([lat, lon]);
+            }
+
+            if (destinationCoords) getRoute();
+        }
+
+        function handleLocationError(error) {
+            alert("Location error: " + error.message);
+        }
+
+        function reverseGeocode(lat, lon) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.address) {
+                        const address = data.address;
+                        const fullAddress = `${address.road || ''}, ${address.city || ''}, ${address.country || ''}`;
+                        document.getElementById('destinationInput').value = fullAddress;
+                    } else {
+                        alert("Unable to retrieve address.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Reverse geocoding error:", error);
+                });
+        }
+
+        function setDestination() {
+            const input = document.getElementById('destinationInput').value;
+            const coords = input.split(',');
+
+            if (coords.length !== 2) {
+                geocodePlace(input);
+            } else {
+                const lat = parseFloat(coords[0]);
+                const lng = parseFloat(coords[1]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    setDestinationPoint(lat, lng);
+                } else {
+                    alert("Invalid coordinates.");
+                }
+            }
+        }
+
+        function geocodePlace(place) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${place}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        setDestinationPoint(lat, lng);
+                    } else {
+                        alert("Place not found. Please enter a valid place name.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Geocoding error:", error);
+                    alert("Failed to geocode place.");
+                });
+        }
+
+        function setDestinationPoint(lat, lng) {
+            destinationCoords = [lat, lng];
+
+            if (destinationMarker) map.removeLayer(destinationMarker);
+            destinationMarker = L.marker(destinationCoords).addTo(map)
+                .bindPopup("Destination").openPopup();
+
+            reverseGeocode(lat, lng);
+            if (startCoords) getRoute();
+        }
+
+        function getRoute() {
+            if (!startCoords || !destinationCoords) return;
+
+            const mode = document.getElementById('transportMode').value;
+            const url = `https://graphhopper.com/api/1/route?point=${startCoords[0]},${startCoords[1]}&point=${destinationCoords[0]},${destinationCoords[1]}&vehicle=${mode}&points_encoded=false&key=${api_key}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.paths || data.paths.length === 0) {
+                        alert("No route could be calculated.");
+                        return;
+                    }
+
+                    if (routePolyline) map.removeLayer(routePolyline);
+
+                    const coordinates = data.paths[0].points.coordinates.map(coord => [coord[1], coord[0]]);
+                    routePolyline = L.polyline(coordinates, {
+                        color: '#0078d7',
+                        weight: 6,
+                        opacity: 0.8
+                    }).addTo(map);
+                    map.fitBounds(routePolyline.getBounds());
+
+                    const travelTimeMin = Math.round(data.paths[0].time / 60000);
+                    const distanceKm = (data.paths[0].distance / 1000).toFixed(2);
+                    const modeText = mode.charAt(0).toUpperCase() + mode.slice(1);
+
+                    document.getElementById('travelInfoBox').style.display = 'block';
+                    document.getElementById('travelInfoBox').textContent = `🚗 ${modeText} - Estimated Time: ${travelTimeMin} min | Distance: ${distanceKm} km`;
+                })
+                .catch(error => {
+                    console.error("Routing error:", error);
+                    alert("Failed to fetch route.");
+                });
+        }
+
+        function openMapsConfirm() {
+            if (!startCoords || !destinationCoords) {
+                alert("Please set both the current and destination locations.");
+                return;
+            }
+            document.getElementById('mapChoiceModal').style.display = 'flex';
+        }
+
+        function closeMapModal() {
+            document.getElementById('mapChoiceModal').style.display = 'none';
+        }
+
+        function openSelectedMap(type) {
+            const startLat = startCoords[0];
+            const startLon = startCoords[1];
+            const destLat = destinationCoords[0];
+            const destLon = destinationCoords[1];
+
+            const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLon}&destination=${destLat},${destLon}&travelmode=driving`;
+            const appleMapsUrl = `https://maps.apple.com/?daddr=${destLat},${destLon}&saddr=${startLat},${startLon}`;
+
+            const url = type === 'google' ? googleMapsUrl : appleMapsUrl;
+            window.open(url, "_blank");
+            closeMapModal();
+        }
+
+        function changeRoute() {
+            if (startCoords && destinationCoords) getRoute();
+        }
+
+        map.on('click', function (e) {
+            setDestinationPoint(e.latlng.lat, e.latlng.lng);
+        });
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

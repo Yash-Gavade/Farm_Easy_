@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fruit Detection</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        header {
+            background-color: #388e3c;
+            color: #fff;
+            text-align: center;
+            padding: 25px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            background-image: url('https://www.transparenttextures.com/patterns/green-dust-and-scratches.png');
+            background-size: cover;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch; /* <- stretch to match height */
+            gap: 40px;
+            padding: 40px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 100, 0, 0.2);
+            padding: 25px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease;
+            min-height: 600px; /* <- ensure both are tall enough */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+        }
+
+
+        #videoFeed {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 4px solid #c8e6c9;
+            box-shadow: 0 6px 12px rgba(0, 100, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* For the captured image */
+        #capturedImage {
+            width: 92%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 4px solid #c8e6c9;
+            box-shadow: 0 6px 12px rgba(0, 100, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+
+
+
+
+
+        button {
+            padding: 14px 30px;
+            font-size: 18px;
+            background-color: #66bb6a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #57a05a;
+            transform: translateY(-3px);
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #388e3c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                max-width: 95%;
+                padding: 15px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>🍏 Fruit Freshness Detection</header>
+
+    <div class="container single-column">
+        <!-- Live Feed -->
+        <div class="card full-width-card">
+            <h3>📹 Live Camera Feed</h3>
+            <img id="videoFeed" src="/video_feed" alt="Live feed" />
+            <button onclick="captureImage()">📸 Capture & Detect</button>
+        </div>
+
+        <!-- Detected Image (optional, below the camera feed) -->
+        <div class="card full-width-card" id="result" style="display: none;">
+            <h3>🍏 Detected Fruits</h3>
+            <img id="capturedImage" src="" alt="Detected Image" />
+
+        </div>
+    </div>
+
+
+
+<script>
+    function captureImage() {
+        fetch("/capture", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                const img = document.getElementById("capturedImage");
+                img.src = data.img_path + "?" + new Date().getTime();
+                document.getElementById("result").style.display = "block";
+
+                // Set up Save button click event
+                const saveButton = document.querySelector('#result button');
+                saveButton.onclick = function() {
+                    saveResult(data.img_path);
+                };
+            });
+    }
+
+
+</script>
+
+</body>
+</html>
