@@ -17,7 +17,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Load YOLOv10 model
-model = YOLO("models/best.pt")  # Update the path if needed
+model = YOLO("models/best10n.pt")  # Update the path if needed
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
