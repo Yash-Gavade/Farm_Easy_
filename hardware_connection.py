@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+import cv2  # OpenCV for USB camera handling
 
 # Setup GPIO pins for Shift Register
 SER_PIN = 17
@@ -50,6 +51,28 @@ def check_air_quality():
     else:
         return "fresh"
 
+# Function to capture an image from the USB camera using OpenCV
+def capture_image():
+    # Open the USB camera (0 is typically the default camera)
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        return None
+    
+    # Capture one frame from the camera
+    ret, frame = cap.read()
+
+    if ret:
+        # Save the captured image
+        cv2.imwrite('captured_image.jpg', frame)
+        print("Image captured and saved.")
+    else:
+        print("Error: Failed to capture image.")
+    
+    # Release the camera
+    cap.release()
+
 # Main function to check fruit freshness
 def check_fruit_freshness():
     air_quality = check_air_quality()
@@ -57,6 +80,9 @@ def check_fruit_freshness():
         spoil_fruit_detected()
     else:
         fresh_fruit_detected()
+
+    # Capture an image of the fruit
+    capture_image()
 
 # Loop through the process
 while True:
