@@ -1,0 +1,2 @@
+/Users/fayizrahman/Documents/Hackathon/FarmAI/android/app/.cxx/Debug/3b2v196d/x86/CMakeFiles/edit_cache.dir
+/Users/fayizrahman/Documents/Hackathon/FarmAI/android/app/.cxx/Debug/3b2v196d/x86/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,18 @@
+<lint-module
+    format="1"
+    dir="/Users/fayizrahman/Documents/Hackathon/FarmAI/android/app"
+    name=":app"
+    type="APP"
+    maven="android:app:"
+    agpVersion="8.1.0"
+    buildFolder="/Users/fayizrahman/Documents/Hackathon/FarmAI/build/app"
+    bootClassPath="/Users/fayizrahman/Library/Android/sdk/platforms/android-35/android.jar:/Users/fayizrahman/Library/Android/sdk/build-tools/33.0.1/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-35">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="adminRelease"/>
+</lint-module>

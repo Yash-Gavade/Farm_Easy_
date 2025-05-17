@@ -1,0 +1,4 @@
+#Sat May 17 15:05:00 CEST 2025
+base.0=/Users/fayizrahman/Documents/Hackathon/FarmAI/build/app/intermediates/dex/adminRelease/minifyAdminReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
