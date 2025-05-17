@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/fayizrahman/Library/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/fayizrahman/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/fayizrahman/Documents/Hackathon/App/e_commerce_app-main/android/app/.cxx/Debug/5p5h16t5/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/fayizrahman/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/fayizrahman/Documents/Hackathon/App/e_commerce_app-main/android/app/.cxx/Debug/5p5h16t5/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
